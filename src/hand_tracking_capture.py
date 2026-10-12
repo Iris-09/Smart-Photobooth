@@ -27,58 +27,58 @@ while cap.isOpened():
         break
         
     frame = cv2.flip(frame, 1)
+    
+    # 1. TẠO MỘT BẢN SAO SẠCH ĐỂ DÀNH RIÊNG CHO VIỆC LƯU ẢNH
+    clean_frame = frame.copy() 
+
     image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     image_rgb.flags.writeable = False
     results = hands.process(image_rgb)
     image_rgb.flags.writeable = True
 
-    # Biến tạm để check xem frame này có chữ V không
     v_sign_detected = False
 
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
-            mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+            # 2. CHỈ VẼ KHUNG XƯƠNG ĐỎ KHI CHƯA ĐẾM NGƯỢC
+            if not is_counting_down:
+                mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+            
+            # Vẫn ngầm kiểm tra chữ V để lấy tín hiệu
             if is_v_sign(hand_landmarks):
                 v_sign_detected = True
 
     # ==========================================
-    # 2. LOGIC ĐẾM NGƯỢC & CHỤP ẢNH
+    # LOGIC ĐẾM NGƯỢC & CHỤP ẢNH
     # ==========================================
-    
-    # Bước A: Kích hoạt đếm ngược nếu thấy chữ V VÀ chưa trong trạng thái đếm
     if v_sign_detected and not is_counting_down:
         is_counting_down = True
         countdown_start_time = time.time()
 
-    # Bước B: Xử lý khi đang trong trạng thái đếm ngược
     if is_counting_down:
         elapsed_time = time.time() - countdown_start_time
         remaining_time = math.ceil(countdown_duration - elapsed_time)
 
         if remaining_time > 0:
-            # Hiển thị số 3-2-1 to ở giữa màn hình
             height, width, _ = frame.shape
             cv2.putText(frame, str(remaining_time), (width//2 - 50, height//2), 
                         cv2.FONT_HERSHEY_SIMPLEX, 5, (0, 0, 255), 10)
         else:
-            # HẾT GIỜ -> LƯU ẢNH
+            # 3. HẾT GIỜ -> LƯU BẢN SAO SẠCH (clean_frame) THAY VÌ frame HIỆN TẠI
             filename = f"photobooth_{int(time.time())}.jpg"
-            cv2.imwrite(filename, frame) # Lệnh lưu ảnh của OpenCV
-            print(f"Đã lưu ảnh: {filename}")
+            cv2.imwrite(filename, clean_frame) 
+            print(f"Đã lưu ảnh sạch: {filename}")
             
-            # Hiển thị chữ FLASH và khựng hình lại nửa giây tạo cảm giác chụp
             cv2.putText(frame, "FLASH!", (width//2 - 150, height//2), 
                         cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 10)
             cv2.imshow('Smart Photobooth - Hand Tracking', frame)
             cv2.waitKey(500) 
             
-            # Reset trạng thái để sẵn sàng chụp tấm tiếp theo
             is_counting_down = False
 
-    # Hiển thị cửa sổ
     cv2.imshow('Smart Photobooth - Hand Tracking', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
+    
 cap.release()
 cv2.destroyAllWindows()
