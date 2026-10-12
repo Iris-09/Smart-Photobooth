@@ -3,12 +3,12 @@ import mediapipe as mp
 import time
 import math
 
-# Khởi tạo MediaPipe (giữ nguyên như trước)
+# Khởi tạo MediaPipe
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7, min_tracking_confidence=0.5)
 
-# Hàm kiểm tra chữ V (đã viết ở bước trước)
+# Hàm kiểm tra chữ V
 def is_v_sign(hand_landmarks):
     lm = hand_landmarks.landmark
     return (lm[8].y < lm[6].y and lm[12].y < lm[10].y and 
