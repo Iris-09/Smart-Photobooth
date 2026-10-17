@@ -26,7 +26,7 @@ while True:
     # Bắt sự kiện bàn phím
     key = cv2.waitKey(1) & 0xFF
     
-    # Nếu nhấn phím 'c' (capture).\venv\Scripts\Activate.ps1python main.py
+    # Nếu nhấn phím 'c' (capture)
     if key == ord('c'):
         # Tạo tên file dựa trên thời gian thực để không bị ghi đè ảnh cũ
         file_name = f"captured_{int(time.time())}.jpg"
@@ -40,7 +40,7 @@ while True:
         cv2.imshow('Smart Photobooth - Test Capture', frame)
         cv2.waitKey(500) # Đóng băng khung hình nửa giây để tạo cảm giác vừa chụp xong
         
-    # Nếu nhấn phím 'q' (quit)
+    # Nếu nhấn phím 'q'
     elif key == ord('q'):
         break
 

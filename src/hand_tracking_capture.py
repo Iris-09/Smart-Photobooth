@@ -48,9 +48,7 @@ while cap.isOpened():
             if is_v_sign(hand_landmarks):
                 v_sign_detected = True
 
-    # ==========================================
     # LOGIC ĐẾM NGƯỢC & CHỤP ẢNH
-    # ==========================================
     if v_sign_detected and not is_counting_down:
         is_counting_down = True
         countdown_start_time = time.time()
